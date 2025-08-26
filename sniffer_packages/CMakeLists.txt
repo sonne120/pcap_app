@@ -111,14 +111,13 @@ endif()
 
 # Try to use vcpkg (recommended)
 # - Requires: vcpkg integrate via toolchain, e.g. -DCMAKE_TOOLCHAIN_FILE=.../vcpkg.cmake
-# - Ports: pcapplusplus, pthreads (or you can rely on system pthreadVC2.lib), and system libs (ws2_32, iphlpapi)
+# - Ports: pcapplusplus and system libs (ws2_32, iphlpapi)
 find_package(PcapPlusPlus CONFIG QUIET)
 
-# Select pthreads library name depending on toolchain
-set(PTHREAD_LIB pthreadVC2)
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU" AND NOT MSVC)
-  set(PTHREAD_LIB pthread)
-endif()
+# Portable thread library
+# Do not prefer pthread on Windows/MSVC; MSVC doesn't use pthreadVC2
+set(THREADS_PREFER_PTHREAD_FLAG OFF)
+find_package(Threads REQUIRED)
 
 if(PcapPlusPlus_FOUND)
   message(STATUS "Found PcapPlusPlus at ${PcapPlusPlus_DIR}")
@@ -142,45 +141,52 @@ if(PcapPlusPlus_FOUND)
 else()
   message(STATUS "PcapPlusPlus not found via CMake config. Trying fallbacks...")
   if(WIN32)
-    # Fallback to local SDK paths (mirrors .vcxproj)
-    # 1) WpdPack (WinPcap/Npcap SDK)
+    # Fallback to local SDK paths in repo: header/WpdPack/WpdPack
     set(WPDPACK_ROOT "${CMAKE_CURRENT_LIST_DIR}/../header/WpdPack/WpdPack" CACHE PATH "Path to WpdPack root")
-    
-    # Verify WpdPack exists
+
     if(NOT EXISTS "${WPDPACK_ROOT}")
-      message(WARNING "WpdPack not found at ${WPDPACK_ROOT}")
-    else()
-      message(STATUS "Using WpdPack from ${WPDPACK_ROOT}")
+      message(FATAL_ERROR "WpdPack not found at ${WPDPACK_ROOT}. Expected repo-local SDK under header/WpdPack/WpdPack")
     endif()
-    
+
+    # Includes
     target_include_directories(sniffer_packages PRIVATE
         "${WPDPACK_ROOT}/Include"
         "${WPDPACK_ROOT}/Include/pcap"
+         "${WPDPACK_ROOT}/lib"
     )
-    # Library paths; add both in case
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-      link_directories("${WPDPACK_ROOT}/Lib/x64")
-    endif()
-    link_directories("${WPDPACK_ROOT}/Lib")
 
-    # 2) PcapPlusPlus (prebuilt libs) — provide directory via cache var
-    set(PCAPPP_LIB_DIR "" CACHE PATH "Path to PcapPlusPlus prebuilt lib directory (containing Common++.lib, Packet++.lib, Pcap++.lib)")
-    if(PCAPPP_LIB_DIR)
-      if(EXISTS "${PCAPPP_LIB_DIR}")
-        message(STATUS "Using PcapPlusPlus libs from ${PCAPPP_LIB_DIR}")
-        link_directories("${PCAPPP_LIB_DIR}")
-      else()
-        message(WARNING "PcapPlusPlus lib directory not found at ${PCAPPP_LIB_DIR}")
-      endif()
+    # Determine correct lib dir for arch
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(_WPDPACK_LIBDIR "${WPDPACK_ROOT}/Lib/x64")
+    else()
+      set(_WPDPACK_LIBDIR "${WPDPACK_ROOT}/Lib")
+    endif()
+
+    # Resolve absolute library paths to avoid relying on global link directories
+    find_library(WPCAP_LIB NAMES wpcap PATHS "${_WPDPACK_LIBDIR}" NO_DEFAULT_PATH)
+    find_library(PACKET_LIB NAMES Packet PATHS "${_WPDPACK_LIBDIR}" NO_DEFAULT_PATH)
+
+    if(NOT WPCAP_LIB OR NOT PACKET_LIB)
+      message(FATAL_ERROR "Could not find wpcap.lib and/or Packet.lib under ${_WPDPACK_LIBDIR}.\n"
+                           "Checked path: ${_WPDPACK_LIBDIR}\n"
+                           "Make sure the repo contains header/WpdPack/WpdPack with Lib/x64/wpcap.lib and Packet.lib for x64 builds.")
+    else()
+      message(STATUS "Using WinPcap/Npcap from ${WPDPACK_ROOT} (libs: ${_WPDPACK_LIBDIR})")
+    endif()
+
+    # Optionally allow prebuilt PcapPlusPlus directory, but it's not required
+    set(PCAPPP_LIB_DIR "" CACHE PATH "Path to PcapPlusPlus prebuilt lib directory (optional)")
+    if(PCAPPP_LIB_DIR AND EXISTS "${PCAPPP_LIB_DIR}")
+      message(STATUS "(Optional) Using PcapPlusPlus libs from ${PCAPPP_LIB_DIR}")
+      link_directories("${PCAPPP_LIB_DIR}")
     endif()
 
     target_link_libraries(sniffer_packages
         PRIVATE
           ws2_32
           iphlpapi
-          wpcap
-          Packet
-          ${PTHREAD_LIB}
+          ${WPCAP_LIB}
+          ${PACKET_LIB}
     )
   else()
     # Unix/macOS fallback - use system libpcap
@@ -204,7 +210,7 @@ else()
     target_link_libraries(sniffer_packages
         PRIVATE
           ${PCAP_LIBRARY}
-          pthread
+          Threads::Threads
     )
     
     message(STATUS "Using system libpcap: ${PCAP_LIBRARY}")
@@ -217,6 +223,11 @@ set_target_properties(sniffer_packages PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
+
+# Avoid PDB API contention in MSVC parallel builds (error C1090)
+if(MSVC)
+  target_compile_options(sniffer_packages PRIVATE /FS)
+endif()
 
 # Summary
 message(STATUS "sniffer_packages: OUTPUT (shared lib) => ${CMAKE_BINARY_DIR}/lib")

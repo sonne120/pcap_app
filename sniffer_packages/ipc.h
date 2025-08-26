@@ -1,6 +1,5 @@
 #ifndef IPC_H
 #define IPC_H
-
 #include <atomic>
 #include <condition_variable>
 #include <mutex>

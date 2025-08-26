@@ -67,8 +67,3 @@ int mainFunc(HANDLE eventHandle) {
 	return 0;
 }
 
-// Placeholder implementation - replace with actual code
-int mainFunction() {
-    // Main function implementation
-    return 0;
-}

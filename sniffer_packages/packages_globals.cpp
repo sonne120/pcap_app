@@ -32,18 +32,12 @@
   #endif
 #endif
 
-// Global variables and functions for package handling
 #include "packages.h"
-
-// Placeholder implementation - replace with actual code
-void initializePackageGlobals() {
-    // Initialize global variables
-}
 
 // Global variable definitions for packages.h
 tagSnapshot shared_buff[buff_max];
 std::atomic<int> free_index(0);
 std::atomic<int> full_index(0);
 std::mutex mtx;
-// Single definition for pcap error buffer (declared extern in builderDevice.h)
+
 char errbuf[PCAP_ERRBUF_SIZE];

@@ -86,7 +86,6 @@ struct sniff_udp {
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "Packet.lib")
-#pragma comment(lib, "pthreadVC2.lib")
 #endif
 
 #define buff_max 5

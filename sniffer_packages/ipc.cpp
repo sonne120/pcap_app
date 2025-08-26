@@ -1,11 +1,4 @@
-// Inter-process communication implementation
 #include "ipc.h"
-
-// Placeholder implementation - replace with actual code
-void initializeIPC() {
-    // IPC initialization code
-}
-
 #include <iostream>
 #include <cstring>
 #include "builderDevice.h"
@@ -22,8 +15,6 @@ std::atomic<int> d1;
 std::mutex m;
 std::condition_variable cv;
 pcap_t* _adhandle1 = nullptr;
-
-// Named pipe server handle (created later in fnCPPDLL)
 HANDLE hPipe = INVALID_HANDLE_VALUE;
 
 // Exported functions
