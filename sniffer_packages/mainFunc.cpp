@@ -1,4 +1,4 @@
-// macOS compatibility shims must appear before including packages.h
+// macOS compatibility 
 #ifdef __APPLE__
   #include <net/ethernet.h>
   #include <netinet/ip.h>
@@ -31,7 +31,6 @@
     #define dport th_dport
   #endif
 #endif
-
 #include "packages.h"
 #include <iostream>
 #include <string.h>

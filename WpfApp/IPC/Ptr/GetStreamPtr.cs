@@ -5,8 +5,8 @@ namespace wpfapp.IPC.Ptr
 {
     public class GetStreamPtr
     {
-        //[DllImport("sniffer_packages.dll", EntryPoint = "fnCPPDLL", CallingConvention = CallingConvention.StdCall)]
-        [DllImport(@"C:\repo\cppp\4\pcap_app\x64\Debug\sniffer_packages.dll", EntryPoint =
+        //llImport("sniffer_packages.dll", EntryPoint = "fnCPPDLL", CallingConvention = CallingConvention.StdCall)]
+        [DllImport(@"C:\repo\cppp\4\pcap_app\sniffer_packages\bin\Debug\sniffer_packages.dll", EntryPoint =
         "fnCPPDLL", CallingConvention = CallingConvention.Cdecl)]
 
         extern static void fnCPPDLL(int dev);

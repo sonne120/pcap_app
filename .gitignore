@@ -11,3 +11,4 @@ header/WpdPack
 !sniffer_packages/handleProto.h
 !sniffer_packages/builderDevice.h
 !compat_net.h
+!serviceApp/Npcap.h
