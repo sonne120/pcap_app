@@ -188,18 +188,19 @@ inline void* Packages::producer(std::atomic<bool>& on) {
 	int res;
 
 	while (true) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-		std::unique_lock lk(m);
+		std::unique_lock<std::mutex> lk(m);
 		_adhandle = nullptr;
-		cv.wait(lk);
+
+		cv.wait(lk, [] { return quit_flag.load(std::memory_order_acquire); });
 		if (_adhandle1 != NULL && _adhandle == NULL)
 			_adhandle = _adhandle1;
 
 		lk.unlock();
 		cv.notify_one();
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 		while ((res = pcap_next_ex(_adhandle, &_pkthdr, &packetd_ptr)) >= 0 && on.load()) {
 			tagSnapshot new_item; u_int size_ip;
@@ -330,7 +331,7 @@ inline void Packages::defaultToStruct(tagSnapshot& item) {
 	strcpy(item.dest_mac, "ff:ff:ff:ff:ff:ff");
 	item.dest_port = 8080;
 	item.source_port = 8081;
-	strcpy(item.host_name, "mx-ll-49.48.52-46.dynamic.3bb.in.th");
+	strcpy(item.host_name, "no found");
 };
 
 #endif // PACKAGES_H

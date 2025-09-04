@@ -22,7 +22,8 @@ set(SNIFFER_SOURCES "")
 foreach(SRC_FILE 
     mainFunc.cpp
     ipc.cpp
-    packages_globals.cpp)
+    packages_globals.cpp
+    builderDevice.cpp)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}")
         list(APPEND SNIFFER_SOURCES "${SRC_FILE}")
     else()
@@ -54,6 +55,23 @@ endif()
 # Create the library with verified sources
 add_library(sniffer_packages SHARED ${SNIFFER_SOURCES} ${SNIFFER_HEADERS})
 target_compile_features(sniffer_packages PUBLIC cxx_std_20)
+
+# Enable debugging symbols and disable optimizations in Debug
+if(MSVC)
+  target_compile_options(sniffer_packages PRIVATE 
+    $<$<CONFIG:Debug>:/Od /Zi /RTC1 /MDd>
+    $<$<CONFIG:Release>:/O2 /MD>
+  )
+  target_link_options(sniffer_packages PRIVATE 
+    $<$<CONFIG:Debug>:/DEBUG:FULL /INCREMENTAL:NO>
+  )
+  # Force PDB generation
+  set_target_properties(sniffer_packages PROPERTIES
+    COMPILE_PDB_NAME "sniffer_packages"
+    COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+  )
+endif()
+
 if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
   target_compile_definitions(sniffer_packages PRIVATE WINx64)
 endif()
@@ -83,9 +101,9 @@ if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
   target_compile_definitions(sniffer_packages PRIVATE WINx64)
 endif()
 
-# Includes: project local
+# Includes: project local (PUBLIC so consumers can include headers)
 target_include_directories(sniffer_packages
-    PRIVATE
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 

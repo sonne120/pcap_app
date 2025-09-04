@@ -8,8 +8,12 @@
 #include <tchar.h>
 #include <windows.h>
 #include <thread>
+#include <stop_token>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
+#include <vector>
 
-// Global variable definitions
 std::atomic_bool quit_flag(false);
 std::atomic<int> d1;
 std::mutex m;
@@ -17,74 +21,138 @@ std::condition_variable cv;
 pcap_t* _adhandle1 = nullptr;
 HANDLE hPipe = INVALID_HANDLE_VALUE;
 
+static std::jthread mainThread;
+HANDLE eventHandle = NULL;
+
+bool ConnectPipeClient() {
+	const wchar_t* pipeName = L"\\\\.\\pipe\\testpipe";
+
+	hPipe = CreateNamedPipeW(
+		pipeName,
+		PIPE_ACCESS_DUPLEX,
+		PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+		PIPE_UNLIMITED_INSTANCES,
+		4096, 4096,
+		0,
+		NULL
+	);
+	if (hPipe != INVALID_HANDLE_VALUE) {
+		DWORD mode = PIPE_READMODE_MESSAGE;
+		if (!SetNamedPipeHandleState(hPipe, &mode, nullptr, nullptr)) {
+			std::wcerr << L"SetNamedPipeHandleState failed. GLE=" << GetLastError() << std::endl;
+		}
+		return true;
+	}
+		Sleep(500);
+	
+	std::wcerr << L"Failed to open pipe. GLE=" << GetLastError() << std::endl;
+	return false;
+}
+
 // Exported functions
 IPC_EXPORT void fnDevCPPDLL(char** data, int* sizes, int* count) {
-    std::vector<std::string> listdev = builderDevice::Builder(0).ListDev().build().getDevices();
-    *count = listdev.size();
-    if (data) {
-        for (int i = 0; i < *count; ++i) {
-            sizes[i] = listdev[i].size();
-            data[i] = new char[sizes[i]+1];
-            std::strcpy(data[i], listdev[i].c_str());
-        }
-    }
+	std::vector<std::string> listdev = builderDevice::Builder(0).ListDevices().Build().getDevices();
+	*count = listdev.size();
+	if (data) {
+		for (int i = 0; i < *count; ++i) {
+			sizes[i] = listdev[i].size();
+			data[i] = new char[sizes[i] + 1];
+			std::strcpy(data[i], listdev[i].c_str());
+		}
+	}
 }
 
 IPC_EXPORT void __stdcall fnCPPDLL(int d) {
-    HANDLE eventHandle = NULL;
-    DWORD IDThread;
-    const WCHAR* name = L"Global\\sniffer";
-    int attempt = 0;
-    while ((eventHandle = OpenEventW(EVENT_MODIFY_STATE | SYNCHRONIZE, FALSE, name)) == NULL && attempt < 200000) {
-        Sleep(1000); ++attempt;
-        std::cout << "Attempt: " << attempt << std::endl;
-    }
 
-    // Create and connect the named pipe server if not already done
-    if (hPipe == INVALID_HANDLE_VALUE) {
-        hPipe = CreateNamedPipeW(
-            L"\\\\.\\pipe\\testpipe",
-            PIPE_ACCESS_DUPLEX,
-            PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
-            1,                 // max instances
-            4096, 4096,        // out/in buffer sizes
-            0,                 // default timeout
-            NULL);             // default security
+	std::cout << "Attempt: YES " << std::endl;
 
-        if (hPipe == INVALID_HANDLE_VALUE) {
-            DWORD le = GetLastError();
-            std::cout << "CreateNamedPipe failed. GLE=" << le << std::endl;
-        } else {
-            BOOL connected = ConnectNamedPipe(hPipe, NULL) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
-            if (!connected) {
-                DWORD le = GetLastError();
-                std::cout << "ConnectNamedPipe failed. GLE=" << le << std::endl;
-                CloseHandle(hPipe);
-                hPipe = INVALID_HANDLE_VALUE;
-            } else {
-                std::cout << "Named pipe connected" << std::endl;
-            }
-        }
-    }
+	HANDLE eventHandle = NULL;
+	DWORD IDThread;
+	const WCHAR* name = L"Global\\sniffer";
+	int attempt = 0;
+	while ((eventHandle = OpenEventW(EVENT_MODIFY_STATE | SYNCHRONIZE, FALSE, name)) == NULL && attempt < 200000) {
+		Sleep(1000); ++attempt;
+		std::cout << "Attempt: " << attempt << std::endl;
+	}
 
-    std::thread t(mainFunc, eventHandle);
-    t.detach();
-    std::cout << "main thread started" << std::endl;
+	if (ConnectPipeClient() == true) {
+		std::cout << "Named pipe created" << std::endl;
+		if (hPipe == INVALID_HANDLE_VALUE) {
+			DWORD le = GetLastError();
+			std::cout << "CreateNamedPipe failed. GLE=" << le << std::endl;
+		}
+		else {
+			BOOL connected = ConnectNamedPipe(hPipe, NULL) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
+			if (!connected) {
+				DWORD le = GetLastError();
+				std::cout << "ConnectNamedPipe failed. GLE=" << le << std::endl;
+				CloseHandle(hPipe);
+				hPipe = INVALID_HANDLE_VALUE;
+			}
+			else {
+				std::cout << "Named pipe connected" << std::endl;
+			}
+		}
+	}
+
+	WaitForSingleObject(eventHandle, INFINITE);
+
+	try {
+		mainThread = std::jthread(
+			[](std::stop_token st, HANDLE eventHandle) {
+				while (!st.stop_requested()) {
+					mainFunc(eventHandle);
+				}
+			},
+			eventHandle
+		);
+
+		std::cout << "main thread started" << std::endl;
+	}
+	catch (const std::exception& e) {
+		std::cout << "Failed to start main thread : "
+			<< e.what() << std::endl;
+	}
+	catch (...) {
+		std::cout << "Failed to start main thread" << std::endl;
+	}
 }
 
 IPC_EXPORT void __stdcall fnPutdevCPPDLL(int dev) {
-    d1 = dev; _adhandle1 = nullptr;
-    builderDevice::Builder builder(dev);
-    builderDevice builderdev(builder);
-    if (quit_flag) quit_flag = false;
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    _adhandle1 = builder.Finddev().OpenDevices().build().getHandler();
-    {
-        std::unique_lock<std::mutex> lock(m);
-        quit_flag = true;
-    }
-    cv.notify_one();
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+   
+	d1 = dev; _adhandle1 = nullptr;
+	builderDevice::Builder builder(dev);
+	if (quit_flag) quit_flag = false;
+	std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	_adhandle1 = builder.FindDevices()
+		.SelectDevice()
+		.OpenSelectedDevice()
+		.Build()
+		.getHandler();
+	{
+		std::unique_lock<std::mutex> lock(m);
+		quit_flag = true;
+	}
+	cv.notify_one();
+	std::this_thread::sleep_for(std::chrono::milliseconds(20));
+}
+
+IPC_EXPORT void __stdcall fnStop()
+{
+	if (mainThread.joinable()) {
+		mainThread.request_stop();
+		if (eventHandle) SetEvent(eventHandle);  
+		mainThread.join();                       
+	}
+
+	if (hPipe != INVALID_HANDLE_VALUE) {
+		CloseHandle(hPipe);
+		hPipe = INVALID_HANDLE_VALUE;
+	}
+	if (eventHandle) {
+		CloseHandle(eventHandle);
+		eventHandle = NULL;
+	}
 }
 
 #else // Unix/Linux
@@ -109,45 +177,45 @@ int hPipe = -1;
 
 // Initialize and open FIFO
 static void init_pipe() {
-    mkfifo(PIPE_PATH, 0666);
-    hPipe = open(PIPE_PATH, O_WRONLY | O_NONBLOCK);
-    if (hPipe == -1) std::cerr << "FIFO open error: " << strerror(errno) << std::endl;
+	mkfifo(PIPE_PATH, 0666);
+	hPipe = open(PIPE_PATH, O_WRONLY | O_NONBLOCK);
+	if (hPipe == -1) std::cerr << "FIFO open error: " << strerror(errno) << std::endl;
 }
 
 // Exported functions
 IPC_EXPORT void fnDevCPPDLL(char** data, int* sizes, int* count) {
-    std::vector<std::string> listdev = builderDevice::Builder(0).ListDev().build().getDevices();
-    *count = listdev.size();
-    if (data) {
-        for (int i = 0; i < *count; ++i) {
-            sizes[i] = listdev[i].size();
-            data[i] = new char[sizes[i]+1];
-            std::strcpy(data[i], listdev[i].c_str());
-        }
-    }
+	std::vector<std::string> listdev = builderDevice::Builder(0).ListDev().build().getDevices();
+	*count = listdev.size();
+	if (data) {
+		for (int i = 0; i < *count; ++i) {
+			sizes[i] = listdev[i].size();
+			data[i] = new char[sizes[i] + 1];
+			std::strcpy(data[i], listdev[i].c_str());
+		}
+	}
 }
 
 IPC_EXPORT void fnCPPDLL(int d) {
-    std::thread t([](){
-        init_pipe();
-        mainFunc((HANDLE)0);
-    });
-    t.detach();
-    std::cout << "main thread started (Linux)" << std::endl;
+	std::thread t([]() {
+		init_pipe();
+		mainFunc((HANDLE)0);
+		});
+	t.detach();
+	std::cout << "main thread started (Linux)" << std::endl;
 }
 
 IPC_EXPORT void fnPutdevCPPDLL(int dev) {
-    d1 = dev; _adhandle1 = nullptr;
-    builderDevice::Builder builder(dev);
-    builderDevice builderdev(builder);
-    if (quit_flag) quit_flag = false;
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    _adhandle1 = builder.Finddev().OpenDevices().build().getHandler();
-    {
-        std::unique_lock<std::mutex> lock(m);
-        quit_flag = true;
-    }
-    cv.notify_one();
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	d1 = dev; _adhandle1 = nullptr;
+	builderDevice::Builder builder(dev);
+	builderDevice builderdev(builder);
+	if (quit_flag) quit_flag = false;
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	_adhandle1 = builder.Finddev().OpenDevices().build().getHandler();
+	{
+		std::unique_lock<std::mutex> lock(m);
+		quit_flag = true;
+	}
+	cv.notify_one();
+	std::this_thread::sleep_for(std::chrono::milliseconds(20));
 }
 #endif
