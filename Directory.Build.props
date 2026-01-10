@@ -1,6 +1,8 @@
 <Project>
   <PropertyGroup>
-    <!-- Force C++ projects to target an installed Windows 10 SDK version -->
-    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <!-- Let MSBuild pick the highest installed Windows 10+ SDK. -->
+    <WindowsTargetPlatformVersion Condition="'$(WindowsTargetPlatformVersion)' == ''">10.0</WindowsTargetPlatformVersion>
+    <!-- If solution had been pinned to an unsupported SDK (e.g. 10.0.26100.0 for certain arches), relax it -->
+    <WindowsTargetPlatformVersion Condition="'$(WindowsTargetPlatformVersion)' == '10.0.26100.0'">10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
 </Project>

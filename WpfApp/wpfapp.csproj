@@ -5,25 +5,49 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWPF>true</UseWPF>
     <PlatformTarget>x64</PlatformTarget>
     <UseAppHost>true</UseAppHost>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Platforms>AnyCPU;ARM64;x64</Platforms>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+  <DebugSymbols>true</DebugSymbols>
+  <DebugType>portable</DebugType>
+  <Optimize>false</Optimize>
+</PropertyGroup>
+
+  <!-- ARM64 overrides -->
+  <PropertyGroup Condition="'$(Platform)'=='ARM64'">
+    <PlatformTarget>ARM64</PlatformTarget>
+    <RuntimeIdentifier>win-arm64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <!-- Native build directories (manual external CMake builds expected) -->
+  <PropertyGroup>
+    <SnifferRoot>$(MSBuildThisFileDirectory)..\sniffer_packages</SnifferRoot>
+    <SnifferBuildX64>$(SnifferRoot)\build_x64</SnifferBuildX64>
+    <SnifferBuildARM64>$(SnifferRoot)\build_arm64</SnifferBuildARM64>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <Optimize>True</Optimize>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <Optimize>True</Optimize>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <Optimize>False</Optimize>
+  <DebugSymbols>true</DebugSymbols>
+  <DebugType>portable</DebugType>
+</PropertyGroup>
+<!-- Debug|ARM64 already configured above, no duplicate needed -->
 
   <ItemGroup>
     <None Remove="appsettings.json" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -57,47 +81,54 @@
     <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
     <PackageReference Include="ToggleSwitch" Version="1.2.0" />
   </ItemGroup>
-  
-  <ItemGroup> 
-    <Protobuf Include="Protos\sniffering.proto" OutputDir="%(RelativePath)models/" /> 
-    </ItemGroup> 
 
   <ItemGroup>
+    <Protobuf Include="Protos\sniffering.proto" OutputDir="%(RelativePath)models/" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="ssl\" />
-  </ItemGroup> 
+  </ItemGroup>
 
-  <!-- Copy native DLL(s) built by MSVC vcxproj into the WPF output directory -->
+  <!-- Native DLL paths (must exist from manual CMake builds) -->
   <PropertyGroup>
-    <NativeDllSourceDir>$(MSBuildThisFileDirectory)..\sniffer_packages\x64\$(Configuration)\</NativeDllSourceDir>
+    <NativeDllDir Condition="'$(Platform)'=='x64' Or '$(PlatformTarget)'=='x64'">$(SnifferBuildX64)\bin\$(Configuration)\</NativeDllDir>
+    <NativeDllDir Condition="'$(Platform)'=='ARM64'">$(SnifferBuildARM64)\bin\$(Configuration)\</NativeDllDir>
   </PropertyGroup>
 
-  <Target Name="CopyNativeSnifferDll" AfterTargets="Build">
+  <Target Name="CopySnifferDll" AfterTargets="Build">
     <ItemGroup>
-      <NativeCopy Include="$(NativeDllSourceDir)sniffer_packages.dll" Condition="Exists('$(NativeDllSourceDir)sniffer_packages.dll')" />
-      <NativeCopy Include="$(NativeDllSourceDir)Packet.dll" Condition="Exists('$(NativeDllSourceDir)Packet.dll')" />
-      <NativeCopy Include="$(NativeDllSourceDir)wpcap.dll" Condition="Exists('$(NativeDllSourceDir)wpcap.dll')" />
+      <NativeCopy Include="$(NativeDllDir)sniffer_packages.dll" Condition="Exists('$(NativeDllDir)sniffer_packages.dll')" />
+      <NativeCopy Include="$(NativeDllDir)Packet.dll" Condition="Exists('$(NativeDllDir)Packet.dll')" />
+      <NativeCopy Include="$(NativeDllDir)wpcap.dll" Condition="Exists('$(NativeDllDir)wpcap.dll')" />
     </ItemGroup>
-    <Copy SourceFiles="@(NativeCopy)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" ContinueOnError="false" />
+    <Copy SourceFiles="@(NativeCopy)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="@(NativeCopy)!=''" />
+    <Warning Text="sniffer_packages native DLLs not found in $(NativeDllDir); build them manually with CMake." Condition="@(NativeCopy)==''" />
   </Target>
 
   <ItemGroup>
-    <ProjectReference Include="..\sniffer_packages\sniffer_packages.vcxproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-  </ItemGroup> 
-
+  </ItemGroup>
   <ItemGroup>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup> 
+  </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 
 </Project>

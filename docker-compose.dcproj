@@ -10,6 +10,13 @@
     <DockerServiceName>loadbalancer</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="BUILD_SUCCESS_REPORT.md" />
+    <None Include="CPP_FIXES_APPLIED.md" />
+    <None Include="CPP_LOGIC_FIX_SUMMARY.md" />
+    <None Include="CPP_PIPE_ANALYSIS.md" />
+    <None Include="CPP_QUICK_START.md" />
+    <None Include="CPP_TESTING_CHECKLIST.md" />
+    <None Include="DEVICE_SWITCH_FIX.md" />
     <None Include="docker-compose-consul.yml" />
     <None Include="docker-compose-kafka.yml" />
     <None Include="docker-compose-mysql.yml" />
@@ -18,7 +25,19 @@
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="FINAL_BUILD_REPORT.md" />
+    <None Include="FINAL_FIX_COMPLETE.md" />
+    <None Include="FIX_BREAKPOINTS.md" />
+    <None Include="LOG_ANALYSIS_FIX.md" />
     <None Include="mongo_shards.yml" />
+    <None Include="QUICK_TEST_GUIDE.md" />
+    <None Include="rebuild-cpp-fixes.ps1" />
+    <None Include="START_STOP_CAPTURE_ANALYSIS.md" />
+    <None Include="START_STOP_FLOW.md" />
+    <None Include="START_STOP_INTEGRATION.md" />
+    <None Include="UI_PACKET_FLOW_FIX.md" />
+    <None Include="VERIFICATION_COMPLETE.md" />
+    <None Include="x64_TEST_PLAN.md" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="build.bat" />

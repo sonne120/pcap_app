@@ -6,7 +6,10 @@ namespace wpfapp.Services.Worker
     {
         public async Task? PutDeviceAsync(int dev)
         {
-            PutdevPtr.PutDev(dev);
+            await Task.Run(() =>
+            {
+                PutdevPtr.PutDev(dev);
+            });
         }
 
         public void PutDevices(int dev)

@@ -7,9 +7,7 @@ namespace wpfapp.Services.IPC.Ptr
 {
     public static class DevicesPtr
     {
-        //[DllImport("sniffer_packages.dll", EntryPoint = "fnDevCPPDLL", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        [DllImport(@"C:\repo\cppp\4\pcap_app\sniffer_packages\bin\Debug\sniffer_packages.dll", EntryPoint =
-        "fnDevCPPDLL", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("sniffer_packages.dll", EntryPoint = "fnDevCPPDLL", CallingConvention = CallingConvention.Cdecl)]
         public extern static void fnDevCPPDLL(IntPtr[]? data, int[]? sizes, ref int count);
         public static IEnumerable<string> GetAllDevices()
         {
@@ -41,3 +39,5 @@ namespace wpfapp.Services.IPC.Ptr
         }
     }
 }
+  
+                    

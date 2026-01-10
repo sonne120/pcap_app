@@ -4,7 +4,9 @@
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <tchar.h>
+#ifndef SNIFFER_PCAP_DISABLED
 #include <pcap.h>
+#endif
 
 #define SIZE_ETHERNET 14
 #define ETHER_ADDR_LEN 6

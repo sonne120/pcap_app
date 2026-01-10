@@ -16,7 +16,10 @@
 #include <unistd.h>
 typedef void* HANDLE;
 #endif
+
+// Always use real pcap now (stub mode removed)
 #include <pcap.h>
+
 #include <vector>
 #include <string>
 #include <atomic>
@@ -31,13 +34,11 @@ typedef void* HANDLE;
 #include "ether_ntoa.h"
 
 #ifdef __APPLE__
-// Ensure ETHER_HDR_LEN exists
 #ifndef ETHER_HDR_LEN
 #define ETHER_HDR_LEN 14
 #endif
 #endif
 
-// Provide cross-platform aliases used in code
 #ifndef SIZE_ETHERNET
 #define SIZE_ETHERNET ETHER_HDR_LEN
 #endif
@@ -45,7 +46,6 @@ typedef void* HANDLE;
 #define IPv4_ETHERTYPE ETHERTYPE_IP
 #endif
 
-// IP header helpers expected by code
 #ifndef IP_HL
 #define IP_HL(ip) ((ip)->ip_hl)
 #endif
@@ -53,14 +53,12 @@ typedef void* HANDLE;
 #define IP_V(ip) ((ip)->ip_v)
 #endif
 
-// Some code uses ip_vhl (Linux/Windows). On BSD/macOS map to ip_hl
 #ifdef __APPLE__
 #ifndef ip_vhl
 #define ip_vhl ip_hl
 #endif
 #endif
 
-// Portable TCP/UDP header definitions to avoid platform-specific field names
 struct sniff_tcp {
     uint16_t th_sport;   // source port
     uint16_t th_dport;   // destination port
@@ -80,7 +78,7 @@ struct sniff_udp {
     uint16_t uh_sum;
 };
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #pragma warning(disable:4996)
 #pragma comment(lib, "wpcap.lib")
 #pragma comment(lib, "ws2_32.lib")
@@ -128,10 +126,9 @@ public:
 	int* dst_porth;
 };
 
-// Inline implementations (Windows-specific parts guarded)
 inline Packages::Packages():i(0), src_port(0),dst_port(0),d(nullptr),src_porth(nullptr),dst_porth(nullptr),_adhandle(nullptr), _eventHandles(nullptr), packetd_ptr(nullptr), _pkthdr(nullptr), alldevs(nullptr), descr(nullptr), protoh(nullptr),proto('\0')
 {
-	//new_proto[22] ='\0';	
+	// new_proto zeroed implicitly
 }
 
 inline Packages::Packages(handleProto pp) :_proto(&_proto) {
@@ -204,7 +201,6 @@ inline void* Packages::producer(std::atomic<bool>& on) {
 
 		while ((res = pcap_next_ex(_adhandle, &_pkthdr, &packetd_ptr)) >= 0 && on.load()) {
 			tagSnapshot new_item; u_int size_ip;
-
 #ifdef _WIN32
 			WaitForSingleObject(_eventHandles, INFINITE);
 #endif
@@ -236,29 +232,26 @@ inline void* Packages::producer(std::atomic<bool>& on) {
 			strcpy(packet_srcip, inet_ntoa(ip_hdr->ip_src));
 			strcpy(packet_dstip, inet_ntoa(ip_hdr->ip_dst));
 
-			// MACs: source from shost, destination from dhost
 			src_ptr_mac = eptr->ether_shost;
 			dst_ptr_mac = eptr->ether_dhost;
 			ether_ntoa(src_ptr_mac, source_mac, sizeof source_mac);
 			ether_ntoa(dst_ptr_mac, dest_mac, sizeof dest_mac);
 
-			// Perform a reverse DNS lookup
 			host = gethostbyaddr((const char*)&ip_hdr->ip_dst, sizeof(ip_hdr->ip_dst), AF_INET);
 			if (host != nullptr) {
 				host_names = host->h_name;
 			}
-			else {                
-				host_names = str.data();
+			else {
+				host_names = (char*)str.data();
 			}
 
-			int packet_id = ntohs(ip_hdr->ip_id),
-				packet_ttl = ip_hdr->ip_ttl,
-				packet_tos = ip_hdr->ip_tos,
-				packet_len = ntohs(ip_hdr->ip_len),
-				packet_hlen = ip_hdr->ip_vhl;
+			int packet_id = ntohs(ip_hdr->ip_id);
+			int packet_ttl = ip_hdr->ip_ttl;
+			int packet_tos = ip_hdr->ip_tos;
+			int packet_len = ntohs(ip_hdr->ip_len);
+			int packet_hlen = ip_hdr->ip_vhl;
 
 			int protocol_type = ip_hdr->ip_p;
-			// Initialize ports to 0 before parsing L4 headers
 			*dst_porth = 0;
 			*src_porth = 0;
 
@@ -281,16 +274,15 @@ inline void* Packages::producer(std::atomic<bool>& on) {
 			}
 
 			auto iter = _proto.caseMap.find(protocol_type);
-
 			if (iter != _proto.caseMap.end()) {
-				iter->second();				
+				iter->second();
 			}
 
 			if (ntohs(eptr->ether_type) == IPv4_ETHERTYPE) {
 				ip_hdr = (struct ip*)(packetd_ptr + SIZE_ETHERNET);
 				size_ip = IP_HL(ip_hdr) * 4;
 				if (IP_V(ip_hdr) == 4) {
-
+					// IPv4 specific processing placeholder
 				}
 			}
 
@@ -298,7 +290,7 @@ inline void* Packages::producer(std::atomic<bool>& on) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(500));
 			}
 			mtx.lock();
-			
+
 			strcpy(new_proto, protoh);
 			Packages::addToStruct(new_proto, packet_srcip, packet_dstip, source_mac, dest_mac, packet_id, dst_port, src_port, host_names, new_item);
 			shared_buff[free_index] = new_item;

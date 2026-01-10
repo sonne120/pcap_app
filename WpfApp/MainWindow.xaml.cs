@@ -110,7 +110,7 @@ namespace wpfapp
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            RaiseEvent(new RoutedEventArgs(ClosingEvent, e));
+            //RaiseEvent(new RoutedEventArgs(ClosingEvent, e));
         }
 
         private void cDevice_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

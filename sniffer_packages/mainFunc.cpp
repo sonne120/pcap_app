@@ -1,4 +1,4 @@
-// macOS compatibility 
+﻿// macOS compatibility 
 #ifdef __APPLE__
   #include <net/ethernet.h>
   #include <netinet/ip.h>
@@ -31,6 +31,7 @@
     #define dport th_dport
   #endif
 #endif
+#include "Sniffer.h"
 #include "packages.h"
 #include <iostream>
 #include <string.h>
@@ -43,26 +44,33 @@
 #include <builderDevice.h>
 #include <handleProto.h>
 
-int mainFunc(HANDLE eventHandle) {
+int mainFunc(HANDLE eventHandle, int deviceIndex) {
+    // Wait for start signal
+    {
+        std::unique_lock<std::mutex> lock(m);
+        cv.wait(lock, [] { return quit_flag.load(); });
+    }
 
-	int file = 0; bool dev = true;
-	handleProto p;
-	Packages pack(p);
-	auto lmd = [&pack](HANDLE eventHandle) {pack.setHandler(eventHandle); };
-	lmd(eventHandle);
+    // Get the latest device index from the global atomic variable
+    int currentDeviceIndex = d1.load();
+    std::cout << "[mainFunc] Starting Sniffer with device index: " << currentDeviceIndex << std::endl;
 
-	if (dev || file)
-	{
-		std::vector<std::unique_ptr<std::thread>> threads;
-		threads.emplace_back(std::make_unique<std::thread>([&pack]() {pack.producer(std::ref(quit_flag));}));
-		threads.emplace_back(std::make_unique<std::thread>([&pack]() {pack.consumer();}));
+    auto sniffer = SnifferBuilder()
+        .UseDevice(currentDeviceIndex) // Use 0 to skip internal opening and use global _adhandle1
+        .SetEventHandle(eventHandle)
+        .AddSubscriber(std::make_shared<PipeWriterSubscriber>())
+        .Build();
 
-		for (auto& thread : threads) {
-			thread->join();
-		}
-	}
-	
-	std::cout << "capture finished" << std::endl;
-	return 0;
+    sniffer->Start();
+    
+    // Wait for stop signal
+    {
+        std::unique_lock<std::mutex> lock(m);
+        cv.wait(lock, [] { return !quit_flag.load(); });
+    }
+
+    std::cout << "[mainFunc] Stopping Sniffer..." << std::endl;
+    sniffer->Stop();
+    
+    return 0;
 }
-

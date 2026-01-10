@@ -54,15 +54,15 @@ if [ -z "${TARGET}" ] || [ "${TARGET}" = "sniffer_packages" ]; then
   if [ -d "lib" ]; then
     echo "Library directory exists: $(ls -la lib)"
     if [ -f "lib/libsniffer_packages.so" ] || [ -f "lib/libsniffer_packages.dylib" ] || [ -f "lib/sniffer_packages.dll" ]; then
-      echo "✅ sniffer_packages library was built successfully."
+      echo " sniffer_packages library was built successfully."
     else
-      echo "❌ sniffer_packages library was not built."
+      echo "sniffer_packages library was not built."
       echo "Please check:"
       echo "1. All source files exist (mainFunc.cpp, ipc.cpp, packages_globals.cpp)"
       echo "2. Source files are in the correct location: $(pwd)/../sniffer_packages/"
     fi
   else
-    echo "❌ Library directory not found!"
+    echo "Library directory not found!"
   fi
 fi
 
