@@ -4,6 +4,11 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
   exit
 }
 
+
+
+
+
+
 $svcName = "PacketCaptureService"
 $binPath = "C:\repo\cppp\4\pcap_app\serviceApp\Debug\serviceApp.exe"
 
