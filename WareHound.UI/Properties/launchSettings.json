@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WareHound.UI": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

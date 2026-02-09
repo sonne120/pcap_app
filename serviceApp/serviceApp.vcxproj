@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
@@ -138,7 +138,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus /bigobj /FS</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -168,10 +168,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -179,11 +179,11 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying sniffer_packages DLL and PDB from C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug to serviceApp output directory</Message>
+      <Message>Copying WareHound.Sniffer DLL and PDB from C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug to serviceApp output directory</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.dll C:/repo/pcap_app/serviceApp/Debug
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.dll C:/repo/pcap_app/serviceApp/Debug
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.pdb C:/repo/pcap_app/serviceApp/Debug
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.pdb C:/repo/pcap_app/serviceApp/Debug
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -193,7 +193,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lib\Debug\sniffer_packages.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\bin\Debug\WareHound.Sniffer.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention>
@@ -216,7 +216,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus /bigobj /FS</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -246,10 +246,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -257,11 +257,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying sniffer_packages DLL and PDB from C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug to serviceApp output directory</Message>
+      <Message>Copying WareHound.Sniffer DLL and PDB from C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug to serviceApp output directory</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.dll C:/repo/pcap_app/serviceApp/Debug
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.dll C:/repo/pcap_app/serviceApp/Debug
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.pdb C:/repo/pcap_app/serviceApp/Debug
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.pdb C:/repo/pcap_app/serviceApp/Debug
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -271,7 +271,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lib\Debug\sniffer_packages.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\bin\Debug\WareHound.Sniffer.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention>
@@ -294,7 +294,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus /bigobj /FS</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -325,10 +325,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -336,11 +336,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying sniffer_packages DLL and PDB from C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug to serviceApp output directory</Message>
+      <Message>Copying WareHound.Sniffer DLL and PDB from C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug to serviceApp output directory</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.dll C:/repo/pcap_app/serviceApp/Release
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.dll C:/repo/pcap_app/serviceApp/Release
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.pdb C:/repo/pcap_app/serviceApp/Release
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.pdb C:/repo/pcap_app/serviceApp/Release
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -350,7 +350,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lib\Release\sniffer_packages.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\bin\Release\WareHound.Sniffer.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention>
@@ -373,7 +373,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus /bigobj /FS</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -404,10 +404,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -415,11 +415,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying sniffer_packages DLL and PDB from C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug to serviceApp output directory</Message>
+      <Message>Copying WareHound.Sniffer DLL and PDB from C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug to serviceApp output directory</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.dll C:/repo/pcap_app/serviceApp/Release
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.dll C:/repo/pcap_app/serviceApp/Release
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.pdb C:/repo/pcap_app/serviceApp/Release
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.pdb C:/repo/pcap_app/serviceApp/Release
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -429,7 +429,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lib\Release\sniffer_packages.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\bin\Release\WareHound.Sniffer.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention>
@@ -452,7 +452,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus /bigobj /FS</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -483,10 +483,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -494,11 +494,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying sniffer_packages DLL and PDB from C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug to serviceApp output directory</Message>
+      <Message>Copying WareHound.Sniffer DLL and PDB from C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug to serviceApp output directory</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.dll C:/repo/pcap_app/serviceApp/MinSizeRel
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.dll C:/repo/pcap_app/serviceApp/MinSizeRel
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.pdb C:/repo/pcap_app/serviceApp/MinSizeRel
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.pdb C:/repo/pcap_app/serviceApp/MinSizeRel
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -508,7 +508,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lib\MinSizeRel\sniffer_packages.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\bin\MinSizeRel\WareHound.Sniffer.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention>
@@ -531,7 +531,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus /bigobj /FS</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -562,10 +562,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -573,11 +573,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying sniffer_packages DLL and PDB from C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug to serviceApp output directory</Message>
+      <Message>Copying WareHound.Sniffer DLL and PDB from C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug to serviceApp output directory</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.dll C:/repo/pcap_app/serviceApp/MinSizeRel
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.dll C:/repo/pcap_app/serviceApp/MinSizeRel
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.pdb C:/repo/pcap_app/serviceApp/MinSizeRel
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.pdb C:/repo/pcap_app/serviceApp/MinSizeRel
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -587,7 +587,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lib\MinSizeRel\sniffer_packages.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\bin\MinSizeRel\WareHound.Sniffer.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention>
@@ -610,7 +610,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus /bigobj /FS</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -640,10 +640,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -651,11 +651,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying sniffer_packages DLL and PDB from C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug to serviceApp output directory</Message>
+      <Message>Copying WareHound.Sniffer DLL and PDB from C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug to serviceApp output directory</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.dll C:/repo/pcap_app/serviceApp/RelWithDebInfo
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.dll C:/repo/pcap_app/serviceApp/RelWithDebInfo
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.pdb C:/repo/pcap_app/serviceApp/RelWithDebInfo
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.pdb C:/repo/pcap_app/serviceApp/RelWithDebInfo
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -665,7 +665,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lib\RelWithDebInfo\sniffer_packages.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\bin\RelWithDebInfo\WareHound.Sniffer.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention>
@@ -688,7 +688,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus /bigobj /FS</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -718,10 +718,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\sniffer_packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include;C:\\repo\\pcap_app\\serviceApp\..\header\WpdPack\WpdPack\Include\pcap;C:\\repo\\pcap_app\\WareHound.Sniffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -729,11 +729,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying sniffer_packages DLL and PDB from C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug to serviceApp output directory</Message>
+      <Message>Copying WareHound.Sniffer DLL and PDB from C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug to serviceApp output directory</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.dll C:/repo/pcap_app/serviceApp/RelWithDebInfo
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.dll C:/repo/pcap_app/serviceApp/RelWithDebInfo
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../sniffer_packages/bin/Debug/sniffer_packages.pdb C:/repo/pcap_app/serviceApp/RelWithDebInfo
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/repo/pcap_app/serviceApp/../WareHound.Sniffer/bin/Debug/WareHound.Sniffer.pdb C:/repo/pcap_app/serviceApp/RelWithDebInfo
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -743,7 +743,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lib\RelWithDebInfo\sniffer_packages.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\bin\RelWithDebInfo\WareHound.Sniffer.lib;ws2_32.lib;iphlpapi.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\wpcap.lib;C:\\repo\\pcap_app\\header\WpdPack\WpdPack\Lib\x64\Packet.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention>
@@ -893,12 +893,13 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="C:\\repo\\pcap_app\\serviceApp\sniffer_packages_build\sniffer_packages.vcxproj">
-      <Project>{BFDFD9DA-D939-3719-BD44-971184D0A28B}</Project>
-      <Name>sniffer_packages</Name>
+    <ProjectReference Include="$(SolutionDir)WareHound.Sniffer\WareHound.Sniffer.vcxproj">
+      <Project>{E3671798-1BAC-4B94-80F8-0A567758C0B8}</Project>
+      <Name>WareHound.Sniffer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
+

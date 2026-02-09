@@ -1,0 +1,425 @@
+<Window x:Class="WareHound.UI.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:ctls="clr-namespace:WareHound.UI.Controls"
+        xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        Title="WareHound - Network Packet Analyzer" 
+        Height="700" Width="1100"
+        MinHeight="600" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanResizeWithGrip"
+        fw:AcrylicWindow.Enabled="True"
+        Name="MainWin">
+    
+    <Border Background="{StaticResource PrimaryBrush}"
+            CornerRadius="8"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Sidebar Navigation -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource SidebarBrush}"
+                    CornerRadius="8 0 0 8">
+                <Grid x:Name="GridNav" Width="60">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Logo/Title Section -->
+                    <Grid Grid.Row="0">
+                        <TextBlock Text="🐺" FontSize="24" 
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"
+                                   Margin="18,0,0,0"/>
+                        <TextBlock Text="WareHound" 
+                                   FontSize="16" FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   Margin="60,0,0,0"/>
+                    </Grid>
+
+                    <!-- Menu Items -->
+                    <StackPanel Grid.Row="1" Margin="0,20,0,20">
+                        <ctls:MenuItem x:Name="btnCapture"
+                                       AutomationProperties.Name="Capture"
+                                       GroupName="NavMenu" 
+                                       Icon="{StaticResource CaptureIcon}" 
+                                       IconWidth="18" 
+                                       Text="Capture"
+                                       IsSelected="True"
+                                       Command="{Binding NavigateCommand}"
+                                       CommandParameter="CaptureView"
+                                       MouseEnter="btnCapture_MouseEnter" 
+                                       MouseLeave="NavButton_MouseLeave"/>
+                        
+                        <ctls:MenuItem x:Name="btnDashboard"
+                                       AutomationProperties.Name="Dashboard"
+                                       GroupName="NavMenu" 
+                                       Icon="{StaticResource DashboardIcon}" 
+                                       IconWidth="18" 
+                                       Text="Dashboard"
+                                       Command="{Binding NavigateCommand}"
+                                       CommandParameter="DashboardView"
+                                       MouseEnter="btnDashboard_MouseEnter" 
+                                       MouseLeave="NavButton_MouseLeave"/>
+                        
+                        <ctls:MenuItem x:Name="btnStatistics"
+                                       AutomationProperties.Name="Statistics"
+                                       GroupName="NavMenu" 
+                                       Icon="{StaticResource StatisticsIcon}" 
+                                       IconWidth="18" 
+                                       Text="Statistics"
+                                       Command="{Binding NavigateCommand}"
+                                       CommandParameter="StatisticsView"
+                                       MouseEnter="btnStatistics_MouseEnter" 
+                                       MouseLeave="NavButton_MouseLeave"/>
+                        
+                        <ctls:MenuItem x:Name="btnLogs"
+                                       AutomationProperties.Name="Logs"
+                                       GroupName="NavMenu" 
+                                       Icon="{StaticResource LogIcon}" 
+                                       IconWidth="18" 
+                                       Text="Logs"
+                                       Command="{Binding NavigateCommand}"
+                                       CommandParameter="LogView"
+                                       MouseEnter="btnLogs_MouseEnter" 
+                                       MouseLeave="NavButton_MouseLeave"/>
+                        
+                         <ctls:MenuItem x:Name="btnSettings"
+                                       AutomationProperties.Name="Settings"
+                                       GroupName="NavMenu" 
+                                       Icon="{StaticResource SettingsIcon}" 
+                                       IconWidth="18" 
+                                       Text="Settings"
+                                       Command="{Binding NavigateCommand}"
+                                       CommandParameter="SettingsView"
+                                       MouseEnter="btnSettings_MouseEnter" 
+                                       MouseLeave="NavButton_MouseLeave"/>
+                    </StackPanel>
+
+                    <!-- Status Indicator at Bottom -->
+                    <StackPanel Grid.Row="2" Margin="0,0,0,16">
+                        <Border HorizontalAlignment="Center" 
+                                Background="{StaticResource TertiaryBrush}"
+                                CornerRadius="12" Padding="8,4">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="8" Height="8" Margin="0,0,8,0">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Fill" Value="{StaticResource TextSecondaryBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCapturing}" Value="True">
+                                                    <Setter Property="Fill" Value="{StaticResource SuccessBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+                                <TextBlock Text="{Binding StatusText}" 
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="10"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Tooltip Popup -->
+                    <Popup x:Name="NavPopup" AllowsTransparency="True" 
+                           HorizontalOffset="5" VerticalOffset="0"
+                           Placement="Right">
+                        <ctls:UserPopup x:Name="PopupHeader"/>
+                    </Popup>
+                </Grid>
+            </Border>
+
+            <!-- Main Content Area -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="24"/>
+                </Grid.RowDefinitions>
+
+                <!-- Title Bar -->
+                <Border Grid.Row="0" 
+                        Background="{StaticResource SecondaryBrush}"
+                        MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Hamburger Toggle -->
+                        <ToggleButton x:Name="Tg_Btn" 
+                                      Grid.Column="0"
+                                      Style="{StaticResource HamburgerToggleButtonStyle}"
+                                      Margin="8,0,0,0">
+                            <ToggleButton.Triggers>
+                                <EventTrigger RoutedEvent="ToggleButton.Unchecked">
+                                    <BeginStoryboard>
+                                        <Storyboard x:Name="HideNavPanel">
+                                            <DoubleAnimation Storyboard.TargetName="GridNav" 
+                                                           Storyboard.TargetProperty="Width"
+                                                           From="210" To="60" 
+                                                           Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="ToggleButton.Checked">
+                                    <BeginStoryboard>
+                                        <Storyboard x:Name="ShowNavPanel">
+                                            <DoubleAnimation Storyboard.TargetName="GridNav" 
+                                                           Storyboard.TargetProperty="Width"
+                                                           From="60" To="210" 
+                                                           Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </ToggleButton.Triggers>
+                        </ToggleButton>
+
+                        <!-- Center Content - Capture Controls -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" 
+                                    HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Margin="16,0,0,0">
+                            <!-- Interface Selection with Loading Overlay -->
+                            <Grid Width="280">
+                                <ComboBox Style="{StaticResource ModernComboBoxStyle}"
+                                          Height="26"
+                                          ItemsSource="{Binding Devices}" 
+                                          SelectedItem="{Binding SelectedDevice}"
+                                          DisplayMemberPath="DisplayName"
+                                          Visibility="{Binding IsLoadingDevices, Converter={StaticResource InverseBoolToVisibility}}">
+                                    <ComboBox.IsEnabled>
+                                        <MultiBinding Converter="{StaticResource AllFalseConverter}">
+                                            <Binding Path="IsCapturing"/>
+                                            <Binding Path="HasDeviceLoadError"/>
+                                        </MultiBinding>
+                                    </ComboBox.IsEnabled>
+                                </ComboBox>
+                                
+                                <!-- Loading Spinner - shown when loading -->
+                                <Border Background="{DynamicResource TertiaryBrush}" 
+                                        CornerRadius="4" Height="26"
+                                        Visibility="{Binding IsLoadingDevices, Converter={StaticResource BoolToVisibility}}">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Path Data="{StaticResource RefreshIcon}" 
+                                              Width="14" Height="14"
+                                              Stretch="Uniform"
+                                              Fill="{DynamicResource SecondaryTextBrush}"
+                                              RenderTransformOrigin="0.5,0.5">
+                                            <Path.RenderTransform>
+                                                <RotateTransform x:Name="SpinnerRotation"/>
+                                            </Path.RenderTransform>
+                                            <Path.Style>
+                                                <Style TargetType="Path">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsLoadingDevices}" Value="True">
+                                                            <DataTrigger.EnterActions>
+                                                                <BeginStoryboard>
+                                                                    <Storyboard RepeatBehavior="Forever">
+                                                                        <DoubleAnimation Storyboard.TargetProperty="(Path.RenderTransform).(RotateTransform.Angle)"
+                                                                                         From="0" To="360" Duration="0:0:1"/>
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </DataTrigger.EnterActions>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Path.Style>
+                                        </Path>
+                                        <TextBlock Text="Loading devices..." 
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="11"
+                                                   Margin="8,0,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                
+                                <!-- Error with Retry - shown when loading failed -->
+                                <Border Background="{DynamicResource ErrorBrush}" 
+                                        CornerRadius="4" Height="26"
+                                        Opacity="0.9"
+                                        Visibility="{Binding HasDeviceLoadError, Converter={StaticResource BoolToVisibility}}">
+                                    <Grid>
+                                        <TextBlock Text="{Binding DeviceLoadError}" 
+                                                   Foreground="White"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Left"
+                                                   FontSize="10"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Margin="8,0,60,0"
+                                                   ToolTip="{Binding DeviceLoadError}"/>
+                                        <Button Content="Retry" 
+                                                Command="{Binding RetryLoadDevicesCommand}"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Padding="8,2"
+                                                Margin="0,0,4,0"
+                                                FontSize="10"
+                                                Background="White"
+                                                Foreground="{DynamicResource ErrorBrush}"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                            
+                            <!-- Play/Stop Buttons -->
+                            <Button Style="{StaticResource CaptureControlButtonStyle}"
+                                    Tag="{StaticResource PlayIcon}"
+                                    Command="{Binding StartCaptureCommand}"
+                                    ToolTip="Start Capture"
+                                    Margin="8,0,0,0"/>
+                            <Button Style="{StaticResource CaptureControlButtonStyle}"
+                                    Tag="{StaticResource StopIcon}"
+                                    Command="{Binding StopCaptureCommand}"
+                                    ToolTip="Stop Capture">
+                                <Button.Resources>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Fill" Value="{StaticResource ErrorBrush}"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+
+                            <Separator Style="{StaticResource VerticalSeparatorStyle}" Margin="12,6"/>
+
+                            <!-- Clear Button -->
+                            <Button x:Name="ClearButton" 
+                                    AutomationProperties.AutomationId="ClearButton"
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    Command="{Binding ClearCommand}" 
+                                    Content="Clear"
+                                    Height="26"
+                                    Margin="0,0,8,0"
+                                    Padding="16,0"/>
+
+                            <Separator Style="{StaticResource VerticalSeparatorStyle}" Margin="4,6"/>
+
+                            <!-- PCAP File Operations -->
+                            <Button Style="{StaticResource CaptureControlButtonStyle}"
+                                    Tag="{StaticResource OpenIcon}"
+                                    Command="{Binding OpenPcapCommand}"
+                                    ToolTip="Open PCAP File"
+                                    Margin="4,0,0,0"/>
+                            <Button Style="{StaticResource CaptureControlButtonStyle}"
+                                    Tag="{StaticResource SaveIcon}"
+                                    Command="{Binding SavePcapCommand}"
+                                    ToolTip="Save as PCAP"/>
+
+                            <!-- Filter Section -->
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                                <ComboBox x:Name="FilterTypeComboBox"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          ItemsSource="{Binding FilterTypes}"
+                                          SelectedItem="{Binding SelectedFilterType}"
+                                          DisplayMemberPath="DisplayName"
+                                          Width="100" Height="26"
+                                          Margin="0,0,4,0" SelectionChanged="FilterTypeComboBox_SelectionChanged"/>
+
+                                <!-- Filter Value TextBox-->
+                                <Grid VerticalAlignment="Center" 
+                                      Visibility="{Binding IsFilterTypeSelected, Converter={StaticResource BoolToVisibility}}">
+                                    <TextBlock Text="{Binding FilterPlaceholder}" 
+                                               VerticalAlignment="Center" 
+                                               Foreground="{StaticResource TextSecondaryBrush}" 
+                                               Margin="10,0,0,0" 
+                                               IsHitTestVisible="False"
+                                               Panel.ZIndex="1"
+                                               Visibility="{Binding FilterText, Converter={StaticResource NullToVisibility}, ConverterParameter=Invert}"/>
+                                    <TextBox x:Name="FilterTextBox" 
+                                             AutomationProperties.AutomationId="FilterTextBox"
+                                             Style="{StaticResource ModernTextBoxStyle}"
+                                             Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" 
+                                             Width="150" Height="26"
+                                             Padding="8,0"
+                                             VerticalContentAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Clear Filter Button -->
+                                <Button Style="{StaticResource WindowControlButtonStyle}"
+                                        Command="{Binding ClearFilterCommand}"
+                                        ToolTip="Clear Filter"
+                                        Margin="4,0,0,0"
+                                        Width="26" Height="26"
+                                        Visibility="{Binding IsFilterTypeSelected, Converter={StaticResource BoolToVisibility}}">
+                                    <Path Data="{StaticResource CloseIcon}" 
+                                          Width="10" Height="10"
+                                          Stretch="Uniform"
+                                          Fill="{DynamicResource TextSecondaryBrush}"/>
+                                </Button>
+                            </StackPanel>
+                            
+                            <!-- Packet Count -->
+                            <TextBlock Margin="16,0,0,0"
+                                       Text="{Binding PacketCount, StringFormat='Packets: {0}'}"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"/>
+                        </StackPanel>
+
+                        <!-- Window Controls -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" 
+                                    VerticalAlignment="Center" Margin="0,0,8,0">
+                            <Button x:Name="btnMinimize" 
+                                    Style="{StaticResource WindowControlButtonStyle}"
+                                    Tag="{StaticResource MinimizeIcon}"
+                                    Click="btnMinimize_Click"/>
+                            <Button x:Name="btnMaximize" 
+                                    Click="btnMaximize_Click">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource WindowControlButtonStyle}">
+                                        <Setter Property="Tag" Value="{StaticResource MaximizeIcon}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding WindowState, ElementName=MainWin}" Value="Maximized">
+                                                <Setter Property="Tag" Value="{StaticResource RestoreIcon}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button x:Name="btnClose" 
+                                    Style="{StaticResource CloseButtonStyle}"
+                                    Click="btnClose_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Content Region -->
+                <ContentControl Grid.Row="1" prism:RegionManager.RegionName="ContentRegion"/>
+
+                <!-- Status Bar -->
+                <Border Grid.Row="2" Background="{StaticResource AccentBrush}">
+                    <Grid Margin="8,0">
+                        <TextBlock Text="{Binding PacketCount, StringFormat='Total Packets: {0}'}" 
+                                   Foreground="White" FontSize="11"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentTime, StringFormat='{}{0:HH:mm:ss}'}" 
+                                   Foreground="White" FontSize="11"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
